@@ -1,0 +1,66 @@
+<script>
+    window.shoppingItemData = function (productData) {
+        return {
+            product: productData,
+            getDiscountedPrice() {
+                if (this.product.discountPercentage == 0)
+                    return this.product.price;
+
+                return (
+                    this.product.price *
+                    (1 - this.product.discountPercentage / 100)
+                ).toFixed(2);
+            },
+            isDiscounted() {
+                if (this.product.discountPercentage != 0) return true;
+                return false;
+            },
+            getPriceText() {
+                return `&dollar;${parseFloat(this.product.price).toFixed(2)}`;
+            },
+        };
+    };
+</script>
+<div
+    x-data="shoppingItemData({{ product }});"
+    class="flex gap-3 border-t-gray-400 w-full"
+>
+    <div class="img-wrapper relative min-w-max">
+        <img
+            :src="product.thumbnail"
+            alt="Product thumbnail"
+            width="200"
+            height="200"
+            loading="lazy"
+        />
+        <div
+            class="absolute top-0 right-0 m-2 p-1 text-xs text-white bg-red-500"
+            x-text="'-' + product.discountPercentage + '%'"
+        ></div>
+    </div>
+    <div class="information flex flex-col gap-2 w-full break-words">
+        <div class="font-semibold text-blue-500" x-text="product.title"></div>
+        <div class="stars"></div>
+        <div class="" x-text="product.description"></div>
+    </div>
+    <div class="prices flex flex-col gap-4 w-1/3 min-w-max">
+        <div class="price-wrapper flex gap-1 font-semibold">
+            <div
+                class="text-base"
+                :class="{'text-red-500': isDiscounted()}"
+                x-text="'&dollar;' + getDiscountedPrice();"
+            ></div>
+            <div
+                x-show="isDiscounted();"
+                class="text-gray-400 text-sm line-through"
+                x-html="getPriceText()"
+            ></div>
+        </div>
+        <button
+            type="button"
+            class="text-black font-semibold bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 rounded"
+        >
+            <div class="hover:scale-110 px-4 py-1">Add to Cart</div>
+        </button>
+    </div>
+</div>

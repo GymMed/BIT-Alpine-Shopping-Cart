@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Alpine Shopping Cart</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"
+        ></script>
+    </head>
+    <body>
+        <main class="shadow-xl m-5 p-5 rounded-lg flex flex-col gap-3">
+            <h1 class="text-center text-2xl text-purple-500 font-bold">
+                String Generator Component Using Alpine js
+            </h1>
+            <section
+                class="bg-gray-50 p-5 flex flex-col gap-5 shadow-inner rounded-lg"
+            >
+                <div
+                    x-data="{}"
+                    x-init="loadComponent('shoppingCart', $el)"
+                ></div>
+            </section>
+        </main>
+        <script>
+            function executeScripts(html) {
+                const parsedHTML = new DOMParser().parseFromString(
+                    html,
+                    "text/html"
+                );
+
+                parsedHTML.querySelectorAll("script").forEach((script) => {
+                    const scriptContent = script.textContent;
+                    const scriptFunction = new Function(scriptContent);
+                    scriptFunction();
+                });
+            }
+
+            function loadComponent(componentName, dom, data = {}) {
+                if (!(dom instanceof Element))
+                    throw new Error("Invalid DOM element provided!");
+
+                fetch(`assets/html/components/${componentName}.html`)
+                    .then((response) => response.text())
+                    .then((html) => {
+                        if (Object.keys(data) !== 0) {
+                            html = replacePlaceholders(html, data);
+                        }
+
+                        executeScripts(html);
+                        const newDom = document.createElement("div");
+                        newDom.innerHTML = html;
+
+                        dom.parentNode.replaceChild(newDom, dom);
+                    });
+            }
+
+            function replacePlaceholders(html, data) {
+                // Replace placeholders in the HTML with actual data
+                for (const key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const placeholder = new RegExp(
+                            `{{\\s*${key}\\s*}}`,
+                            "g"
+                        );
+                        html = html.replace(
+                            placeholder,
+                            formatXData(data[key])
+                        );
+                    }
+                }
+                return html;
+            }
+
+            function formatXData(data) {
+                return `{ ${Object.entries(data)
+                    .map(
+                        ([key, value]) =>
+                            `${key.replace(/'/g, "\\'")}: '${
+                                typeof value === "string"
+                                    ? value.replace(/'/g, "\\'")
+                                    : value
+                            }'`
+                    )
+                    .join(", ")} }`;
+            }
+        </script>
+        <script src="assets/js/products.js"></script>
+        <script>
+            document.addEventListener("alpine:init", () => {
+                Alpine.store("shoppingCart", {
+                    products: [],
+                });
+            });
+        </script>
+    </body>
+</html>

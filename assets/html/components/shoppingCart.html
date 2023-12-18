@@ -1,0 +1,15 @@
+<script>
+    window.shoppingCartData = function () {
+        return {};
+    };
+</script>
+<div x-data="shoppingCartData();" x-init="" class="flex flex-col gap-3">
+    <form action="" class="flex flex-col gap-3">
+        <template x-for="(item, index) in products">
+            <div
+                x-data="{}"
+                x-init="loadComponent('shoppingItem', $el, {product: item})"
+            ></div>
+        </template>
+    </form>
+</div>
