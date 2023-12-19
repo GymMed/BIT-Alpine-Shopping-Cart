@@ -8,7 +8,7 @@
         <template x-for="(item, index) in products">
             <div
                 x-data="{}"
-                x-init="loadComponent('shoppingItem', $el, {product: item})"
+                x-init="loadComponent('shoppingItem', $el, {product: item});"
             ></div>
         </template>
     </form>

@@ -54,6 +54,7 @@
                         }
 
                         executeScripts(html);
+                        //dom.outerHTML = html;
                         const newDom = document.createElement("div");
                         newDom.innerHTML = html;
 
@@ -79,16 +80,33 @@
             }
 
             function formatXData(data) {
-                return `{ ${Object.entries(data)
-                    .map(
-                        ([key, value]) =>
-                            `${key.replace(/'/g, "\\'")}: '${
-                                typeof value === "string"
-                                    ? value.replace(/'/g, "\\'")
-                                    : value
-                            }'`
-                    )
-                    .join(", ")} }`;
+                let output = "";
+
+                switch (typeof data) {
+                    case "object": {
+                        output = Object.entries(data)
+                            .map(
+                                ([key, value]) =>
+                                    `${key.replace(/'/g, "\\'")}: '${
+                                        typeof value === "string"
+                                            ? value.replace(/'/g, "\\'")
+                                            : value
+                                    }'`
+                            )
+                            .join(", ");
+                        break;
+                    }
+                    case "string": {
+                        output = data.replace(/'/g, "\\'");
+                        break;
+                    }
+                    default: {
+                        output = data;
+                        break;
+                    }
+                }
+
+                return `{ ${output} }`;
             }
         </script>
         <script src="assets/js/products.js"></script>
