@@ -1,9 +1,18 @@
 <script>
-    window.shoppingCartData = function () {
-        return {};
+    window.shoppingCartData = function (passedProducts) {
+        return {
+            products: passedProducts,
+        };
     };
 </script>
-<div x-data="shoppingCartData();" x-init="" class="flex flex-col gap-3">
+<div
+    x-data="shoppingCartData({{ passedProducts }});"
+    x-init=""
+    class="flex flex-col gap-3"
+>
+    <form action="" class="flex flex-col gap-3">
+        <!-- add filter here! -->
+    </form>
     <form action="" class="flex flex-col gap-3">
         <template x-for="(item, index) in products">
             <div

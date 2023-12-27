@@ -1,4 +1,4 @@
-const products = [
+const defaultProducts = [
     {
         id: 1,
         title: "iPhone 9",

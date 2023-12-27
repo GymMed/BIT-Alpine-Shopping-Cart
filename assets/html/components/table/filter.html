@@ -1,0 +1,76 @@
+<script>
+    window.tableFilterData = function (
+        id,
+        filterFunction,
+        columns,
+        columnNames
+    ) {
+        return {
+            tableId: id,
+            filterFunction: filterFunction,
+            showFilter: false,
+            filterTextValue: "",
+            filterColumnsValue: 0,
+            filterColumns: [],
+            columnNames: [],
+            filterInit() {
+                this.filterColumns = columns;
+                this.columnNames = columnNames;
+            },
+            filterTable() {
+                this.$dispatch(filterFunction, {
+                    text: this.filterTextValue,
+                    selectedColumn: this.filterColumnsValue,
+                });
+            },
+            resetFilterText() {
+                this.filterTextValue = "";
+            },
+        };
+    };
+</script>
+<tr
+    x-data="tableFilterData('{{ tableId }}', '{{ filterFunction }}', {{ filterColumns }}, {{ columnNames }});"
+    x-init="filterInit();"
+    class="bg-purple-700 py-2"
+    @table-filter-data-{{
+    tableId
+    }}.window="filterTable();"
+    @table-filter-reset-{{
+    tableId
+    }}.window="resetFilterText();"
+>
+    <th :colspan="filterColumns.length + 1" class="">
+        <div class="px-3 py-2 flex gap-2">
+            <div
+                class="text-white flex items-center justify-center whitespace-nowrap"
+            >
+                Filter By:
+            </div>
+            <select
+                name="filterColumns"
+                id="filterColumns"
+                x-model="filterColumnsValue"
+                class="p-2 text-purple-600 placeholder-purple-200 border-2 rounded-md focus:ring-blue-500 focus:ring focus:ring-offset-2 focus:ring-offset-white"
+                @change="filterTable();"
+            >
+                <template x-for="(option, optionKey) in filterColumns">
+                    <option
+                        :value="optionKey"
+                        class="text-black"
+                        x-text="columnNames.hasOwnProperty(option) ? columnNames[option] : option"
+                    ></option>
+                </template>
+            </select>
+            <input
+                type="text"
+                name="filterText"
+                id="filterText"
+                placeholder="Text . . ."
+                class="w-full p-2 text-purple-600 placeholder-purple-200 border-2 rounded-md focus:ring-blue-500 focus:ring focus:ring-offset-2 focus:ring-offset-white"
+                x-model="filterTextValue"
+                @input="filterTable();"
+            />
+        </div>
+    </th>
+</tr>

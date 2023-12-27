@@ -1,0 +1,13 @@
+<script>
+    window.headData = function () {
+        return {};
+    };
+</script>
+<header
+    x-data="headData();"
+    class="flex justify-between items-center p-3 border-b shadow-md"
+>
+    <div class="logo"></div>
+    <nav></nav>
+    <div x-data="{}" x-init="loadComponent('header/userInfo', $el)"></div>
+</header>

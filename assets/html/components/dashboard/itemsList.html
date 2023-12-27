@@ -1,0 +1,199 @@
+<script>
+    window.itemsListCRUD = function (
+        tableGuid,
+        passedProducts,
+        columnNames,
+        ignoreColumns
+    ) {
+        return {
+            id: tableGuid,
+            products: [],
+            shownProductsIndexes: [],
+            columnNames: [],
+            headers: [],
+            ignoreColumns: [],
+            showTableActions: false,
+            initItemsListCRUD() {
+                this.products = Object.values(passedProducts);
+                let productKeys = [];
+
+                if (!UtilitiesHelper.isEmptyArray(this.products))
+                    productKeys = Object.keys(this.products[0]);
+
+                UtilitiesHelper.fillArrayToLength(
+                    this.shownProductsIndexes,
+                    this.products.length
+                );
+                this.ignoreColumns = ignoreColumns;
+                this.columnNames = columnNames;
+
+                this.headers = UtilitiesHelper.getArrayWithNotContainedValues(
+                    productKeys,
+                    ignoreColumns
+                );
+            },
+            shownProductsContainsIndexAt(productIndex) {
+                for (
+                    let currentShownProduct = 0;
+                    currentShownProduct < this.shownProductsIndexes.length;
+                    currentShownProduct++
+                ) {
+                    if (
+                        this.shownProductsIndexes[currentShownProduct] ===
+                        productIndex
+                    ) {
+                        return currentShownProduct;
+                    }
+                }
+
+                return -1;
+            },
+            edit(index) {
+                console.log("edit: " + index);
+                this.$dispatch("show-product-modal-" + this.id, {
+                    data: UtilitiesHelper.getSwicthedObjectsKeys(
+                        this.products[index],
+                        this.columnNames
+                    ),
+                });
+            },
+            remove(index) {
+                console.log("remove: " + index);
+            },
+            showModal(index) {
+                this.$dispatch("show-modal-" + this.id, {
+                    data: UtilitiesHelper.getSwicthedObjectsKeys(
+                        this.products[index],
+                        this.columnNames
+                    ),
+                });
+            },
+            filterData(event) {
+                console.log("I should filter here!");
+            },
+        };
+    };
+</script>
+<div
+    x-data="itemsListCRUD('{{ guidTableComponentId }}', {{ passedProducts }}, {{ columnNames }}, {{ ignoreColumns }});"
+    x-init="initItemsListCRUD();"
+    class="flex flex-col gap-3"
+    @start-filtering-data-{{
+    guidTableComponentId
+    }}="filterData"
+>
+    <div
+        x-data="{}"
+        x-init="loadComponent('modal/addProduct', $el, {id: id})"
+    ></div>
+    <div
+        x-data="{}"
+        x-init="loadComponent('modal/dialog', $el, {id: id})"
+    ></div>
+    <table
+        class="w-full transition-transform duration-1000 border-collapse rounded-lg overflow-hidden"
+    >
+        <thead class="rounded-lg shadow-lg relative">
+            <tr
+                class="text-white bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg"
+            >
+                <template x-for="(header, key) in headers">
+                    <th
+                        x-text="columnNames.hasOwnProperty(header) ? columnNames[header] : header;"
+                        class="py-3"
+                    ></th>
+                </template>
+                <th x-text="'Actions'" class="py-3"></th>
+            </tr>
+            <tr
+                class="text-white overflow-visible p-0.5 pt-0 border-2 border-t-0 border-purple-900 absolute right-0 transition-transform duration-500 mr-3 shadow-lg bg-gradient-to-br from-purple-700 to-purple-800 rounded-b-md"
+                @click="showTableActions = !showTableActions;"
+            >
+                <th>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-arrow-down-short hover:animate-pulse hover:scale-125"
+                        viewBox="0 0 16 16"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4"
+                        />
+                    </svg>
+                </th>
+            </tr>
+        </thead>
+        <thead x-show="showTableActions" x-transition.duration.500ms>
+            <tr
+                x-data="{}"
+                x-init="loadComponent('table/filter', $el, {
+                    tableId: id,
+                    filterFunction: 'start-filtering-data-' + id,
+                    filterColumns: headers,
+                    columnNames: columnNames
+                })"
+            ></tr>
+        </thead>
+        <tbody class="">
+            <template x-for="(record, index) in products">
+                <tr
+                    x-show="shownProductsIndexes.includes(index);"
+                    class="bg-gradient-to-br rounded-xl hover:text-white hover:from-purple-200 hover:to-purple-400"
+                    :class="{'bg-transparent': index % 2 !== 0,
+                            'from-purple-100 to-purple-200': shownProductsContainsIndexAt(index) % 2 === 0}"
+                >
+                    <template x-for="(column, columnKey) in record">
+                        <template x-if="headers.includes(columnKey);">
+                            <td x-text="column" class="text-center py-2"></td>
+                        </template>
+                    </template>
+                    <td class="text-center py-2 flex gap-1">
+                        <div
+                            class="flex gap-1 items-center justify-center h-full"
+                        >
+                            <button
+                                type="button"
+                                class="text-black font-semibold bg-gradient-to-br from-green-500 to-green-700 hover:from-green-700 hover:to-green-900 rounded"
+                                @click="edit(index);"
+                            >
+                                <div class="hover:scale-110 px-4 py-1">
+                                    <div
+                                        x-data="{}"
+                                        x-init="loadComponent('icons/edit', $el, {fillColor: 'rgba(255, 255, 255, 1.0)'})"
+                                    ></div>
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                class="text-black font-semibold bg-gradient-to-br from-red-500 to-red-700 hover:from-red-700 hover:to-red-900 rounded"
+                                @click="remove(index);"
+                            >
+                                <div class="hover:scale-110 px-4 py-1">
+                                    <div
+                                        x-data="{}"
+                                        x-init="loadComponent('icons/trashcan', $el, {fillColor: 'rgba(255, 255, 255, 1.0)'})"
+                                    ></div>
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                class="text-black font-semibold bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-700 hover:to-blue-900 rounded"
+                                @click="showModal(index);"
+                            >
+                                <div class="hover:scale-110 px-4 py-1">
+                                    <div
+                                        x-data="{}"
+                                        x-init="loadComponent('icons/addWindow', $el, {fillColor: 'rgba(255, 255, 255, 1.0)'})"
+                                    ></div>
+                                </div>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>

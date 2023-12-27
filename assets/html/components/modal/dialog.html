@@ -1,0 +1,129 @@
+<script>
+    window.dialogModalData = function (id) {
+        console.log(id);
+        return {
+            id: id,
+            data: {},
+            showModal(event) {
+                this.$refs.dialogWindow.showModal();
+                this.data = event.detail.data;
+            },
+            closeModal(event) {
+                this.$refs.dialogWindow.close();
+            },
+            clickModal(event) {
+                if (event.target === this.$refs.dialogWindow) {
+                    this.$refs.dialogWindow.close();
+                }
+            },
+            getImageFirstKeys(object) {
+                if (typeof object !== "object") return object;
+
+                const keys = Object.keys(object);
+                const imageIndexes = [];
+
+                for (const currentKey of keys) {
+                    if (!UtilitiesHelper.isLink(object[currentKey])) {
+                        continue;
+                    }
+
+                    if (!UtilitiesHelper.isImageLink(object[currentKey])) {
+                        continue;
+                    }
+
+                    imageIndexes.push(currentKey);
+                }
+
+                return keys;
+            },
+        };
+    };
+</script>
+<dialog
+    x-data="dialogModalData('{{ id }}');"
+    @show-modal-{{
+    id
+    }}.window="showModal(event);"
+    @close-modal-{{
+    id
+    }}.window="closeModal(event);"
+    @click="clickModal(event);"
+    x-ref="dialogWindow"
+    class="rounded-lg shadow-lg"
+>
+    <div class="p-3 rounded-lg shadow-lg">
+        <div class="flex flex-col gap-3">
+            <div
+                x-text="data.Title"
+                class="w-full text-center font-bold text-2xl text-blue-500"
+            ></div>
+            <div class="flex gap-3">
+                <div class="image-wrapper">
+                    <img
+                        class="rounded-md"
+                        :src="data.Image"
+                        alt="Product image"
+                        width="200"
+                        height="200"
+                        loading="lazy"
+                    />
+                </div>
+                <div class="data-wrapper flex flex-col gap-3">
+                    <div class="id-wrapper px-3 flex gap-3">
+                        <div x-text="'ID:'"></div>
+                        <div x-text="data.ID"></div>
+                    </div>
+                    <div
+                        class="category-wrapper whitespace-nowrap px-3 py-1 w-min bg-gradient-to-br from-yellow-500 to-yellow-700 shadow-inner rounded text-white flex gap-1"
+                    >
+                        <div x-text="'Category:'"></div>
+                        <div x-text="data.Category"></div>
+                    </div>
+                    <div
+                        class="description-wrapper bg-gray-50 rounded p-3 shadow-inner flex flex-col gap-1"
+                    >
+                        <div x-text="'Description:'"></div>
+                        <div x-text="data.Description"></div>
+                    </div>
+                    <div class="price-wrapper px-3 flex gap-1">
+                        <div x-text="'Price:'"></div>
+                        <div
+                            class="text-green-500"
+                            x-text="'&euro;' + data.Price"
+                        ></div>
+                    </div>
+                    <div class="discount-wrapper px-3 flex gap-1">
+                        <div x-text="'Discount:'"></div>
+                        <div
+                            class="text-red-500"
+                            x-text="data.Discount + '%'"
+                        ></div>
+                    </div>
+                    <div class="rating-wrapper px-3 flex gap-1">
+                        <div x-text="'Rating:'"></div>
+                        <div class="text-yellow-500" x-text="data.Rating"></div>
+                    </div>
+                    <div class="stock-wrapper px-3 flex gap-1">
+                        <div x-text="'Stock:'"></div>
+                        <div class="text-red-500" x-text="data.Stock"></div>
+                    </div>
+                    <div
+                        class="brand-wrapper whitespace-nowrap px-3 py-1 rounded bg-gradient-to-br text-white from-red-500 to-red-700 flex gap-1 w-min"
+                    >
+                        <div x-text="'Brand:'"></div>
+                        <div x-text="data.Brand"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button
+                type="button"
+                class="text-white font-semibold bg-gradient-to-br from-red-500 to-red-700 hover:from-red-700 hover:to-red-900 rounded"
+                @click="closeModal(event);"
+            >
+                <div class="hover:scale-110 px-4 py-1">Close</div>
+            </button>
+        </div>
+    </div>
+</dialog>

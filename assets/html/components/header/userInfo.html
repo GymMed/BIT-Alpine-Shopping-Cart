@@ -1,0 +1,38 @@
+<script>
+    window.userInfoData = function () {
+        return {
+            switchPages() {
+                if (
+                    this.$store.router.currentRouteEnum !==
+                    this.$store.router.ROUTES_ENUM.Dashboard
+                ) {
+                    this.$store.router.goTo(
+                        this.$store.router.ROUTES_ENUM.Dashboard
+                    );
+                    return;
+                }
+
+                this.$store.router.goTo(this.$store.router.ROUTES_ENUM.Home);
+            },
+            getText() {
+                if (
+                    this.$store.router.currentRouteEnum !==
+                    this.$store.router.ROUTES_ENUM.Dashboard
+                ) {
+                    return "Dashboard";
+                }
+
+                return "Visit Shop";
+            },
+        };
+    };
+</script>
+<div x-data="userInfoData();" class="user-info">
+    <button
+        type="button"
+        class="text-black text-sm font-semibold bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 rounded"
+        @click="switchPages();"
+    >
+        <div class="hover:scale-110 px-4 py-0.5" x-text="getText();"></div>
+    </button>
+</div>

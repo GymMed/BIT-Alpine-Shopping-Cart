@@ -1,0 +1,11 @@
+<main class="shadow-xl m-5 p-5 rounded-lg flex flex-col gap-3">
+    <h1 class="text-center text-2xl text-purple-500 font-bold">
+        Shopping Cart Alpine js Component
+    </h1>
+    <section class="bg-gray-50 p-5 flex flex-col gap-5 shadow-inner rounded-lg">
+        <div
+            x-data="{}"
+            x-init="loadComponent('shoppingCart', $el, {passedProducts: $store.shoppingCart.products})"
+        ></div>
+    </section>
+</main>

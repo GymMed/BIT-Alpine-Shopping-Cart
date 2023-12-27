@@ -1,0 +1,128 @@
+<script>
+    const PRODUCT_MODAL_STATE_ENUM = {
+        Add: 0,
+        Edit: 1,
+    };
+
+    window.addProductModalData = function (id) {
+        console.log(id);
+
+        return {
+            id: id,
+            data: {},
+            unsavedData: {},
+            productModalDataState: PRODUCT_MODAL_STATE_ENUM.Add,
+            showModal(event) {
+                console.log("show", event.detail.data);
+                this.$refs.dialogWindow.showModal();
+                this.data = event.detail.data;
+                this.unsavedData = { ...data };
+
+                if (
+                    !this.data.hasOwnProperty("ID") ||
+                    typeof this.data.ID !== "number" ||
+                    this.data[ID] < 0
+                ) {
+                    this.productModalDataState = PRODUCT_MODAL_STATE_ENUM.Add;
+                    return;
+                }
+                this.productModalDataState = PRODUCT_MODAL_STATE_ENUM.Edit;
+            },
+            closeModal(event) {
+                console.log("close", this.data);
+                this.$refs.dialogWindow.close();
+            },
+            clickModal(event) {
+                if (event.target === this.$refs.dialogWindow) {
+                    this.$refs.dialogWindow.close();
+                }
+            },
+            getProductModalStateString(enumValue) {
+                switch (enumValue) {
+                    case PRODUCT_MODAL_STATE_ENUM.Add: {
+                        return "Add";
+                    }
+                    case PRODUCT_MODAL_STATE_ENUM.Edit: {
+                        return "Edit";
+                    }
+                    default: {
+                        return "Unknown case";
+                    }
+                }
+            },
+        };
+    };
+</script>
+<dialog
+    x-data="addProductModalData('{{ id }}');"
+    @show-product-modal-{{
+    id
+    }}.window="showModal(event);"
+    @close-product-modal-{{
+    id
+    }}.window="closeModal(event);"
+    @click="clickModal(event);"
+    x-ref="dialogWindow"
+    class="rounded-lg shadow-lg"
+>
+    <div class="p-3 rounded-lg shadow-lg flex flex-col gap-3">
+        <div class="flex flex-col gap-3">
+            <div
+                class="text-2xl font-bold"
+                :class="{
+                    'text-green-500': (productModalDataState === PRODUCT_MODAL_STATE_ENUM.Add),
+                    'text-blue-500': (productModalDataState === PRODUCT_MODAL_STATE_ENUM.Edit)
+                }"
+                x-text="getProductModalStateString(productModalDataState)"
+            ></div>
+            <div class="flex gap-3">
+                <div class="image-wrapper">
+                    <img
+                        class="rounded-md"
+                        :src="data.Image"
+                        alt="Product image"
+                        width="200"
+                        height="200"
+                        loading="lazy"
+                    />
+                </div>
+                <div class="flex flex-col gap-3">
+                    <template x-for="(value, key) in unsavedData">
+                        <div class="flex flex-col gap-1">
+                            <label :for="key" x-text="key"></label>
+                            <input
+                                type="text"
+                                :name="key"
+                                :id="key"
+                                x-model="value"
+                                class="w-full p-2 border-2 rounded-md placeholder-blue-400 focus:ring-blue-500 focus:ring focus:ring-offset-2 focus:ring-offset-white"
+                                :class="{'ring-red-500 ring-offset-2 ring-offset-white': value !== data[key]}"
+                                @input="console.log(value, data[key], $el, key);"
+                            />
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-1 justify-end">
+            <div class="flex justity-end">
+                <button
+                    type="button"
+                    class="text-white font-semibold bg-gradient-to-br from-red-500 to-red-700 hover:from-red-700 hover:to-red-900 rounded"
+                    @click="closeModal(event);"
+                >
+                    <div class="hover:scale-110 px-4 py-1">Close</div>
+                </button>
+            </div>
+            <div class="flex justify-end">
+                <button
+                    type="button"
+                    class="text-white font-semibold bg-gradient-to-br from-green-500 to-green-700 hover:from-green-700 hover:to-green-900 rounded"
+                    @click="closeModal(event);"
+                >
+                    <div class="hover:scale-110 px-4 py-1">Save</div>
+                </button>
+            </div>
+        </div>
+    </div>
+</dialog>
